@@ -4,12 +4,15 @@
 <%#  Part 2: Start here... %>
 <%= form_tag movies_path, method: :get, id: 'ratings_form' do %>
   Include:
-  <% @all_ratings.each do |rating| %>
+  <% @allRatings.each do |rating| %>
     <div class="form-check  form-check-inline">
-      <%= label_tag "ratings[#{rating}]", rating, class: 'form-check-label' %>
+      <%= label_tag "ratings[#{rating}] ", rating , class: 'form-check-label' %>
       <%= check_box_tag "ratings[#{rating}]", "1",  @ratings_to_show.include?(rating), class: 'form-check-input' %>
     </div>
   <% end %>
+  
+  <%= hidden_field_tag 'sort', @sort%>
+  
   <%= submit_tag 'Refresh', id: 'ratings_submit', class: 'btn btn-primary' %>
 <% end %>
 
@@ -17,9 +20,14 @@
   <thead>
     <tr>
       <tr>
-      <th>Movie Title</th>
+      <th class="<%= @sort == 'title' ? 'bg-warning hilite' : '' %>">
+        <%= link_to 'Movie Title', movies_path({:sort => 'title',:ratings => @ratings}), :id => 'title_header' %>
+      </th>
+      
       <th>Rating</th>
-      <th> Release Date</th>
+      <th class="<%= @sort == 'release_date' ? 'bg-warning hilite' : '' %>">
+        <%= link_to 'Release Date', movies_path({:sort => 'release_date', :ratings => @ratings}), :id => 'release_date_header' %>
+      </th>
       <th>More Info</th>
     </tr>
   </thead>

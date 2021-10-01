@@ -7,20 +7,49 @@ class MoviesController < ApplicationController
   end
 
   def index
+    path_info = request.env['PATH_INFO']
     
-    @movies = Movie.all
-    
-    
-    @all_ratings = Movie.all_ratings
-    
-    
-    ratings = params[:ratings].nil? ? @all_ratings : params[:ratings].keys
-    
-    
-    @movies = Movie.with_ratings(ratings)
-    @ratings_to_show = ratings
-  end
+    # Clear the sessiom if no query params are passed as part of the get request.
+    if path_info == '/'
+      session.clear
+    end
 
+    @allRatings = Movie.all_ratings
+
+    check_Rating_Param = (params[:ratings].nil?)
+    check_Sessions_Param = (session[:ratings_to_show].nil? )
+    rates = check_Rating_Param ? ( check_Sessions_Param ? 
+                            @allRatings : JSON.parse(session[:ratings_to_show])) : params[:ratings].keys
+    
+    if params[:sort]
+      session[:sort] = params[:sort]
+      sort = params[:sort]
+    elsif session[:sort]
+      sort = session[:sort]
+    end      
+      
+    @ratings_to_show = rates
+  
+    
+    if (sort == "release_date")
+      @movies = Movie.with_ratings(rates).order(:release_date)
+      
+    elsif (sort == "title") 
+      @movies = Movie.with_ratings(rates).order(:title)
+      
+    
+    elsif (sort != "release_date" and sort != "title")
+      @movies = Movie.with_ratings(rates)
+    end
+    
+    session[:ratings_to_show] = JSON.generate(rates)
+    session[:ratings] = params[:ratings]
+    @sort = sort
+      
+  end
+  
+
+  
   def new
     # default: render 'new' template
   end

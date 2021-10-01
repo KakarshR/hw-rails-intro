@@ -1,14 +1,13 @@
 class Movie < ActiveRecord::Base
 
+    #Get all unique ratings
     def self.all_ratings
-      return ['G', 'PG', 'PG-13' ,'R'] #collection of movie ratings
+      select(:rating).map(&:rating).uniq
     end
     
+    # get all movies with ratings 
     def self.with_ratings(ratings)
-        if ratings.nil? #no rating is selected
-            Movie.all
-        else #filetering by a particular rating
-            Movie.where(rating:ratings)
-        end
+        Movie.where(rating:ratings) 
     end
+    
 end
